@@ -1,5 +1,5 @@
-# Первый вывод дерева, в принципе, не нужен
-def print_tree_ver_1(node):
+# Первый версия вывода дерева, в принципе, не нужна
+def print_tree(node):
     print(node.operation)
     if not isinstance(node.left, Node) and not isinstance(node.right, Node):
         print(node.left, node.right)
