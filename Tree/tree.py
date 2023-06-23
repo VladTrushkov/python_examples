@@ -103,21 +103,56 @@ def intersection_list(list_1, list_2):
             list_1.pop(i)
 
 
-def find_take_out_multiplier(node, multipliers_list, first_start=True):
+def find_take_out_multipliers(node, multipliers_list, first_start=True):
     multipliers_list_2 = []
     if first_start:
         find_multipliers(node.right, multipliers_list)
     else:
         find_multipliers(node.right, multipliers_list_2)
         intersection_list(multipliers_list, multipliers_list_2)
-    print(multipliers_list)
 
     multipliers_list_2 = []
     if node.left.value == "*":
         find_multipliers(node.left, multipliers_list_2)
         intersection_list(multipliers_list, multipliers_list_2)
     else:
-        find_take_out_multiplier(node.left, multipliers_list, first_start=False)
+        find_take_out_multipliers(node.left, multipliers_list, first_start=False)
+
+
+def delete_node(node, value):
+    if node.right.value == value:
+        node.right.value = 1
+        return
+    elif node.left.value == value:
+        node.left.value = 1
+        return
+    else:
+        delete_node(node.left, value)
+
+
+def take_out_multiplier(node, multiplier):
+    if node.value == "+":
+        delete_node(node.right, multiplier)
+        take_out_multiplier(node.left, multiplier)
+    elif node.value == "*":
+        delete_node(node.left, multiplier)
+
+
+def take_out_multipliers(node):
+    multipliers_list = []
+    find_take_out_multipliers(node, multipliers_list)
+    for multiplier in multipliers_list:
+        take_out_multiplier(node, multiplier)
+
+
+def print_tree_expression(node):
+    # Работает пока только с умножением. Подумать над сложением.
+    if not node.left.it_is_leaf() or not node.right.it_is_leaf():
+        if node.value == "*":
+            print(node.right.value, '*', end=' ')
+            print_tree_expression(node.left)
+    else:
+        print(node.right.value, '*', node.left.value)
 
 
 def print_tree(node, indent=4):
@@ -151,12 +186,15 @@ def print_tree(node, indent=4):
 # string = "1 + 2 * a + 3 * b  + 4 * c + 5 * a * b + 6 * a * c + 7 * a * b * c"
 # string = "a + a * b + a * c"
 # string = "a * b * c * d * e"
-string = "a * b * c + a * b + a"
+# string = "a + a * b * c + a * b"  # На этом тесте будет ошибка. Пока не критичная.
+# string = "a * b * c + a * b + a"
+string = "a * b * c * d * e + a * c * b + a * d * b"
 data = string.split()
 tree = create_tree(data)
 print_tree(tree)
-multipliers_list = []
-find_take_out_multiplier(tree, multipliers_list)
-print(multipliers_list)
+print("---------------")
 # tree = simplify_tree(tree)
 # print_tree(tree)
+take_out_multipliers(tree)
+print_tree(tree)
+# print_tree_expression(tree)
